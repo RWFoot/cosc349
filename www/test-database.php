@@ -18,13 +18,13 @@ th, td {
 <body>
 <h1>Database test page</h1>
 
+
 <p>Showing contents of papers table:</p>
 
 <table border="1">
 <tr><th>Paper code</th><th>Paper name</th></tr>
 
 <?php
- 
 $db_host   = '192.168.56.12';
 $db_name   = 'fvision';
 $db_user   = 'webuser';

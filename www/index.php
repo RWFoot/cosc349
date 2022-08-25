@@ -17,13 +17,38 @@ th, td {
 
 <body>
 <h1>Webserver test page.</h1>
+<body>
+	<div id="main">
+	<h1>Papers Database</h1>
+	<div id="websiteuserinput">
+	<h2>Add new papers to the database using the form below.</h2>
+	<hr/>
+	<form action="" method="post">
+	<label>Paper Code:</label>
+	<input type="text" name="code" id="code" required="required" placeholder="Enter paper code here"/><br /><br />
+	<label>Paper Name:</label>
+	<input type="text" name="name" id="name" required="required" placeholder="Enter paper name here"/><br/><br />
 
-<p>This page demonstrates that the webserver on your VM is generating content.</p>
+	<input type="submit" value=" Submit " name="submit"/><br />
+	</form>
+	</div>
 
-<p>You likely now want to <a href="test-database.php">proceed to your webserver's
-database connection testing page</a>. However, note that if there is a network problem reaching the database, the database connection testing page will spend a minute or so waiting before it produces any content.</p>
+<?php
+if(isset($_POST["submit"])){ 
+  $db_host   = '192.168.56.12';
+  $db_name   = 'fvision';
+  $db_user   = 'webuser';
+  $db_passwd = 'insecure_db_pw';
+  
 
-<p>For your assignment work, your project should begin on this page. The only reason the database testing page was not placed within <kbd>index.php</kbd> was to assist you in debugging any network problems you might be having.</p>
+$pdo_dsn = "mysql:host=$db_host;dbname=$db_name";
+
+$pdo = new PDO($pdo_dsn, $db_user, $db_passwd);
+
+$sql = "INSERT INTO papers (code , name)
+VALUES ('".$_POST["code"]."','".$_POST["name"]."')";
+
+
 
 </body>
 </html>

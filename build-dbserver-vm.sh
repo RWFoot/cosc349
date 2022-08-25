@@ -23,6 +23,9 @@ apt-get -y install mysql-server
 # (... and it _is_ necessary for some Docker testing I'm doing)
 service mysql start
 
+echo "DROP DATABASE IF EXISTS fvision;" | mysql
+echo "DROP USER IF EXISTS 'webuser'', webuser;" | mysql
+
 # Run some setup commands to get the database ready to use.
 # First create a database.
 echo "CREATE DATABASE fvision;" | mysql
