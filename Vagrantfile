@@ -1,90 +1,138 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
+# A Vagrantfile to set up three VMs, two webservers and a database server.
 Vagrant.configure("2") do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "ubuntu/focal64"
+# My servers will run Ubuntu software as I have been using it in the labs so far.
+  config.vm.box = "ubuntu/xenial64"
+
+# This sets up a VM for hosting my front end web server.
+  config.vm.define "fwebserver" do |fwebserver|
+     
+# The name of my web server. 
+  fwebserver.vm.hostname = "fwebserver"
+
+# Portforwarding. 
+# This means the host can connect to IP address 127.0.0.1 port 8080, 
+#  and that network request will reach our webserver VM's port 80.
+     fwebserver.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+
+# Set up a private network IP. This will allow VMs to communicate.
+     fwebserver.vm.network "private_network", ip: "192.168.2.11"
+          
+# Sets up permissions for CS labs to access. 
+    fwebserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+
+      fwebserver.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      apt-get install -y apache2 php libapache2-mod-php php-mysql
+      # Change VM's webserver's configuration to use shared folder.
+        # (Look inside test-website.conf for specifics.)
+      cp /vagrant/test-website.conf /etc/apache2/sites-available/
+        # install our website configuration and disable the default
+      a2ensite test-website
+      a2dissite 000-default
+      service apache2 reload
+    SHELL
+end
+ 
 
 
-  config.vm.define "webserver" do |webserver|
-    # These are options specific to the webserver VM
-    webserver.vm.hostname = "webserver"
+# This sets up a VM for hosting my back end web server.
+  config.vm.define "bwebserver" do |bwebserver|
     
-    # This type of port forwarding has been discussed elsewhere in
-    # labs, but recall that it means that our host computer can
-    # connect to IP address 127.0.0.1 port 8080, and that network
-    # request will reach our webserver VM's port 80.
-    webserver.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
-    
-    # We set up a private network that our VMs will use to communicate
-    # with each other. Note that I have manually specified an IP
-    # address for our webserver VM to have on this internal network,
-    # too. There are restrictions on what IP addresses will work, but
-    # a form such as 192.168.2.x for x being 11, 12 and 13 (three VMs)
-    # is likely to work.
-    webserver.vm.network "private_network", ip: "192.168.56.11"
+# The name of my web server. 
+  bwebserver.vm.hostname = "bwebserver"
+ 
+# Portforwarding. 
+# This means the host can connect to IP address 127.0.0.1 port 8081, 
+#  and that network request will reach our webserver VM's port 80.
+     bwebserver.vm.network "forwarded_port", guest: 80, host: 8081, host_ip: "127.0.0.1"
 
-    # This following line is only necessary in the CS Labs... but that
-    # may well be where markers mark your assignment.
-    webserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+# Set up a private network IP. This will allow VMs to communicate.
+     bwebserver.vm.network "private_network", ip: "192.168.2.12"
+            
+# Sets up permissions for CS labs to access. 
+    bwebserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]    
 
-    # Now we have a section specifying the shell commands to provision
-    # the webserver VM. Note that the file test-website.conf is copied
-    # from this host to the VM through the shared folder mounted in
-    # the VM at /vagrant
-    webserver.vm.provision "shell", path: "build-webserver-vm.sh"
-  end
+      bwebserver.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      apt-get install -y apache2 php libapache2-mod-php php-mysql
+      # Change VM's webserver's configuration to use shared folder.
+        # (Look inside test-website.conf for specifics.)
+      cp /vagrant/back-website.conf /etc/apache2/sites-available/
+        # install our website configuration and disable the default
+      a2ensite back-website
+      a2dissite 000-default
+      service apache2 reload
+    SHELL
+end
 
-    # Here is the section for defining the database server, which I have
-  # named "dbserver".
+
+
+# Setup VM for hosting database. Should be able to connect my 2 web servers. 
   config.vm.define "dbserver" do |dbserver|
-    dbserver.vm.hostname = "dbserver"
-    # Note that the IP address is different from that of the webserver
-    # above: it is important that no two VMs attempt to use the same
-    # IP address on the private_network.
-    dbserver.vm.network "private_network", ip: "192.168.56.12"
-    dbserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+     
+# The name of my database server.
+     dbserver.vm.hostname = "dbserver"
+
+# Assigns private network IP.
+     dbserver.vm.network "private_network", ip: "192.168.2.13"
+
+# Forwarding my dbserver 
+     dbserver.vm.network "forwarded_port", guest: 80, host: 3036, host_ip: "127.0.0.1"
+  
+# Sets up permissions for CS labs to access. 
+     dbserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+
+# Now we have a section specifying the shell commands to provision
+    # the dbserver VM. 
+     dbserver.vm.provision "shell", inline: <<-SHELL
+      
+# Update Ubuntu software packages.
+	 apt-get update
+     #apt-get upgrade -y
+
+# We create a shell variable MYSQL_PWD that contains the MySQL root password
+     export MYSQL_PWD='password123'
+
+# Give the password to the installer so that we don't get asked for password.
+     echo "mysql-server mysql-server/root_password password $MYSQL_PWD" | debconf-set-selections 
+     echo "mysql-server mysql-server/root_password_again password $MYSQL_PWD" | debconf-set-selections
+
+# Install the MySQL database server.
+     apt-get -y install mysql-server
+
+# Run some setup commands to get the database ready to use.
+      # First create a database.       
+     echo "CREATE DATABASE testdb;" | mysql
     
-    dbserver.vm.provision "shell", path: "build-dbserver-vm.sh"
+# Create a database user "admin" with the given password, "admin".
+     echo "CREATE USER 'admin'@'%' IDENTIFIED BY 'password123';" | mysql
+
+# Provide all privilieges to the admin user.
+     echo "GRANT ALL PRIVILEGES ON testdb.* TO 'admin'@'%'" | mysql      
+       
+# Set the MYSQL_PWD shell variable that the mysql command will
+      # try to use as the database password ...
+     export MYSQL_PWD='password123'       
+
+# ... and run all of the SQL within the setup-database.sql file,
+      # which is part of the repository containing this Vagrantfile, so you
+      # can look at the file on your host.
+     cat /vagrant/setup-database.sql | mysql -u admin testdb
+       
+# By default, MySQL only listens for local network requests,
+      # i.e., that originate from within the dbserver VM. We need to
+      # change this so that the webserver VM can connect to the
+      # database on the dbserver VM.
+     sed -i'' -e '/bind-address/s/127.0.0.1/0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf       
+
+# We then restart the MySQL server to make changes.
+service mysql restart
+     SHELL
   end
 
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    #apt-get install -y apache2
-
-    # Change VM's webserver's configuration to use shared folder.
-    # (Look inside test-website.conf for specifics.)
-   # cp /vagrant/test-website.conf /etc/apache2/sites-available/
-    # install our website configuration and disable the default
-   # a2ensite test-website
-   # a2dissite 000-default
-   # service apache2 reload
-  SHELL
+  
 end
