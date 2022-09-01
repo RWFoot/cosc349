@@ -1,10 +1,8 @@
-CREATE TABLE music (
-  songname varchar(50) NOT NULL,
-  artist varchar(50) NOT NULL
+CREATE TABLE papers (
+  paperCode varchar(7) NOT NULL,
+  name varchar(50) NOT NULL,
+  PRIMARY KEY (paperCode)
 );
 
-INSERT INTO music (songname,artist) VALUES ('After Hours','The Weeknd');
-INSERT INTO music (songname,artist) VALUES ('Here Comes The Sun','The Beatles');
-INSERT INTO music (songname,artist) VALUES ('Gravity','John Mayer');
-INSERT INTO music (songname,artist) VALUES ('7 Days','Craig David');
-INSERT INTO music (songname,artist) VALUES ('Passionfruit','Drake');
+INSERT INTO papers (paperCode, name) VALUES ('COSC326','Computational Problem Solving');
+INSERT INTO papers (paperCode, name) VALUES ('COSC349','Cloud Computing Architecture');
