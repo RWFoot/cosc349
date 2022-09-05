@@ -15,8 +15,8 @@ Copy and paste https://github.com/RWFoot/cosc349/archive/refs/heads/master.zip i
 Then in your terminal go to the directory you cloned/downloaded the repository to and enter the command: vagrant up
 
 Click below to access the user website:
-Front page
+http://127.0.0.1:8080/
 
 
 Click below for the database input:
-database table
+http://127.0.0.1:8081/
