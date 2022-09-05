@@ -1,54 +1,37 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html>
-<head><title>Webserver test page</title>
-<style>
-th { text-align: left; }
-
-table, th, td {
-  border: 2px solid grey;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 0.2em;
-}
-</style>
+<main>
+<head>
+<title>Papers</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<h1>Webserver test page.</h1>
-<body>
-	<div id="main">
-	<h1>Papers Database</h1>
-	<div id="websiteuserinput">
-	<h2>Add new papers to the database using the form below.</h2>
-	<hr/>
-	<form action="" method="post">
-	<label>Paper Code:</label>
-	<input type="text" name="code" id="code" required="required" placeholder="Enter paper code here"/><br /><br />
-	<label>Paper Name:</label>
-	<input type="text" name="name" id="name" required="required" placeholder="Enter paper name here"/><br/><br />
+<h1>papers</h1>
 
-	<input type="submit" value=" Submit " name="submit"/><br />
-	</form>
-	</div>
+<p></p>
 
-<?php
-if(isset($_POST["submit"])){ 
-  $db_host   = '192.168.56.12';
-  $db_name   = 'fvision';
-  $db_user   = 'webuser';
-  $db_passwd = 'insecure_db_pw';
-  
+<table border="1">
+<tr><th>Code</th><th>Name</th></tr>
+<?php 
+
+$db_host   = '192.168.2.13';
+$db_name   = 'testdb';
+$db_user   = 'admin';
+$db_passwd = 'password123';
 
 $pdo_dsn = "mysql:host=$db_host;dbname=$db_name";
 
 $pdo = new PDO($pdo_dsn, $db_user, $db_passwd);
+$q = $pdo->query("SELECT * FROM papers");
 
-$sql = "INSERT INTO papers (code , name)
-VALUES ('".$_POST["code"]."','".$_POST["name"]."')";
+while($row = $q->fetch()){
+  echo "<tr><td>".$row["paperCode"]."</td><td>".$row["name"]."</td></tr>\n";
+}
+?>
 
 
-
+</table>
 </body>
+</main>
 </html>
