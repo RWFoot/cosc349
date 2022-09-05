@@ -1,46 +1,40 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<!DOCTYPE HTML>
 <html>
-<head><title>Database test page</title>
-<style>
-th { text-align: left; }
-
-table, th, td {
-  border: 2px solid grey;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 0.2em;
-}
-</style>
+<main>
+<head>
+<title>Add codes Page</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<h1>Database test page</h1>
-
-
-<p>Showing contents of papers table:</p>
-
-<table border="1">
-<tr><th>Paper code</th><th>Paper name</th></tr>
 
 <?php
-$db_host   = '192.168.56.12';
-$db_name   = 'fvision';
-$db_user   = 'webuser';
-$db_passwd = 'insecure_db_pw';
+$db_host   = '192.168.2.13';
+$db_name   = 'testdb';
+$db_user   = 'admin';
+$db_passwd = 'password123';
 
-$pdo_dsn = "mysql:host=$db_host;dbname=$db_name";
+$conn = mysqli_connect($db_host, $db_user, $db_passwd, $db_name);
 
-$pdo = new PDO($pdo_dsn, $db_user, $db_passwd);
-
-$q = $pdo->query("SELECT * FROM papers");
-
-while($row = $q->fetch()){
-  echo "<tr><td>".$row["code"]."</td><td>".$row["name"]."</td></tr>\n";
+if(!$conn){
+  die("Connection Error: " . mysql_error());
 }
 
+$code = $_POST['code'];
+$name = $_POST['name'];
+
+$sql = "INSERT INTO papers (paperCode, name) VALUES('$code', '$name')";
+
+if (mysqli_query($conn, $sql)){
+  echo "Successfully added code to the playlist";
+} else{
+  echo "Failed to add selected code to the playlist";
+  }
+
+mysqli_close($conn);
+
 ?>
-</table>
+<h2><a href="http://127.0.0.1:8080/">Click here to see all papers</a></h2>
 </body>
+</main>
 </html>
