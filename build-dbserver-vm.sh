@@ -39,4 +39,3 @@
 
 # We then restart the MySQL server to make changes.
 service mysql restart
-     SHELL
