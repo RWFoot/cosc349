@@ -1,0 +1,28 @@
+main{
+  background-color: #cdc6c6;
+}
+
+body{
+    background-color: #cdc6c6;
+}
+
+th { 
+  text-align: left; 
+}
+
+table, th, td {
+  border: 2px solid grey;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.2em;
+}
+
+h1 {
+  color: blue;
+}
+
+p {
+  color: black;
+}

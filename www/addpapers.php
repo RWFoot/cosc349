@@ -9,7 +9,7 @@
 <body>
 <h1>Add a new paper</h1>
 
-<form action="insert.php" method="post">
+<form action="test-database.php" method="post">
 <label>Code:</label>
 <input type="text" id="code" name="code" required="required" placeholder="Enter the code to add"/><br /><br />
 <label>Name:</label>
